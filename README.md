@@ -4,10 +4,10 @@ A simple (but correct) Pascal class for validating email addresses.
 
 Supports mail addresses as defined in rfc5322 as well as the new Internationalized Mail Address standards (rfc653x).
 
-Ported from CSharp to Pascal using this Library [EmailValidation](https://github.com/jstedfast/EmailValidation)  
+Ported from CSharp to Pascal using this Library [EmailValidation](https://github.com/jstedfast/EmailValidation)
 
-Example
----------
+**`Example`**
+
 	uses
 	    SysUtils, uEmailValidation;
 	var
@@ -33,7 +33,7 @@ Example
 	end;
     end;
 
-   > For International Addresses
+   > **`For International Addresses`**
 
 
     uses
