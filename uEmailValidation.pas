@@ -20,6 +20,9 @@ unit uEmailValidation;
 
   3. This notice may not be removed or altered from any source distribution.
 
+  Special thanks to Andreas Hausladen for suggesting I use static class
+  functions.
+
 }
 
 /// <summary>
@@ -38,62 +41,55 @@ type
   TEmailValidator = class
   strict private
 
+  class var
   const
     atomCharacters: String = '!#$%&''*+-/=?^_`{|}~';
 
-    function MyIndexOf(C: Char; InString: String): Integer;
-    function IsLetterOrDigit(C: Char): Boolean;
-    function IsAtom(C: Char; allowInternational: Boolean): Boolean;
-    function IsDomain(C: Char; allowInternational: Boolean): Boolean;
-    function SkipAtom(Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean;
-    function SkipSubDomain(Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean;
-    function SkipDomain(Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean;
-    function SkipQuoted(Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean;
-    function SkipWord(Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean;
-    function SkipIPv4Literal(Text: String; var Index: Integer): Boolean;
-    function IsHexDigit(C: Char): Boolean;
-    function SkipIPv6Literal(Text: String; var Index: Integer): Boolean;
+    class function MyIndexOf(C: Char; InString: String): Integer; static;
+    class function IsLetterOrDigit(C: Char): Boolean; static;
+    class function IsAtom(C: Char; allowInternational: Boolean)
+      : Boolean; static;
+    class function IsDomain(C: Char; allowInternational: Boolean)
+      : Boolean; static;
+    class function SkipAtom(Text: String; var Index: Integer;
+      allowInternational: Boolean): Boolean; static;
+    class function SkipSubDomain(Text: String; var Index: Integer;
+      allowInternational: Boolean): Boolean; static;
+    class function SkipDomain(Text: String; var Index: Integer;
+      allowInternational: Boolean): Boolean; static;
+    class function SkipQuoted(Text: String; var Index: Integer;
+      allowInternational: Boolean): Boolean; static;
+    class function SkipWord(Text: String; var Index: Integer;
+      allowInternational: Boolean): Boolean; static;
+    class function SkipIPv4Literal(Text: String; var Index: Integer)
+      : Boolean; static;
+    class function IsHexDigit(C: Char): Boolean; static;
+    class function SkipIPv6Literal(Text: String; var Index: Integer)
+      : Boolean; static;
 
   public
-    Constructor Create;
-    Destructor Destroy; Override;
-    function Validate(Email: String;
-      allowInternational: Boolean = False): Boolean;
+    class function Validate(Email: String; allowInternational: Boolean = False)
+      : Boolean; static;
 
   end;
 
 implementation
 
-Constructor TEmailValidator.Create;
-begin
-  inherited Create;
-end;
-
-Destructor TEmailValidator.Destroy;
-begin
-  Inherited Destroy;
-end;
-
-function TEmailValidator.MyIndexOf(C: Char; InString: String): Integer;
+class function TEmailValidator.MyIndexOf(C: Char; InString: String): Integer;
 
 begin
-
   Result := Pos(C, InString) - 1;
 end;
 
-function TEmailValidator.IsLetterOrDigit(C: Char): Boolean;
+class function TEmailValidator.IsLetterOrDigit(C: Char): Boolean;
 begin
 
   Result := ((C >= 'A') and (C <= 'Z')) or ((C >= 'a') and (C <= 'z')) or
     ((C >= '0') and (C <= '9'));
 end;
 
-function TEmailValidator.IsAtom(C: Char; allowInternational: Boolean): Boolean;
+class function TEmailValidator.IsAtom(C: Char;
+  allowInternational: Boolean): Boolean;
 
 begin
   if Ord(C) < 128 then
@@ -102,8 +98,8 @@ begin
     Result := allowInternational;
 end;
 
-function TEmailValidator.IsDomain(C: Char; allowInternational: Boolean)
-  : Boolean;
+class function TEmailValidator.IsDomain(C: Char;
+  allowInternational: Boolean): Boolean;
 
 begin
   if Ord(C) < 128 then
@@ -112,7 +108,7 @@ begin
     Result := allowInternational;
 end;
 
-function TEmailValidator.SkipAtom(Text: String; var Index: Integer;
+class function TEmailValidator.SkipAtom(Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 var
   startIndex: Integer;
@@ -127,7 +123,7 @@ begin
   Result := Index > startIndex;
 end;
 
-function TEmailValidator.SkipSubDomain(Text: String; var Index: Integer;
+class function TEmailValidator.SkipSubDomain(Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 
 begin
@@ -146,7 +142,7 @@ begin
   Result := True;
 end;
 
-function TEmailValidator.SkipDomain(Text: String; var Index: Integer;
+class function TEmailValidator.SkipDomain(Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 
 begin
@@ -176,7 +172,7 @@ begin
   Result := True;
 end;
 
-function TEmailValidator.SkipQuoted(Text: String; var Index: Integer;
+class function TEmailValidator.SkipQuoted(Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 var
   Escaped: Boolean;
@@ -221,7 +217,7 @@ begin
 
 end;
 
-function TEmailValidator.SkipWord(Text: String; var Index: Integer;
+class function TEmailValidator.SkipWord(Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 
 begin
@@ -237,7 +233,7 @@ begin
   end;
 end;
 
-function TEmailValidator.SkipIPv4Literal(Text: String;
+class function TEmailValidator.SkipIPv4Literal(Text: String;
   var Index: Integer): Boolean;
 var
   Groups, startIndex, Value: Integer;
@@ -269,7 +265,7 @@ begin
   Result := Groups = 4;
 end;
 
-function TEmailValidator.IsHexDigit(C: Char): Boolean;
+class function TEmailValidator.IsHexDigit(C: Char): Boolean;
 begin
 
   Result := ((C >= 'A') and (C <= 'F')) or ((C >= 'a') and (C <= 'f')) or
@@ -293,7 +289,7 @@ end;
 // ; No more than 4 groups in addition to the "::" and
 // ; IPv4-address-literal may be present
 
-function TEmailValidator.SkipIPv6Literal(Text: String;
+class function TEmailValidator.SkipIPv6Literal(Text: String;
   var Index: Integer): Boolean;
 var
   Compact: Boolean;
@@ -392,11 +388,11 @@ end;
 /// <returns><c>true</c> if the email address is valid; otherwise <c>false</c>.</returns>
 /// <param name="Email">An email address.</param>
 /// <param name="allowInternational"><value>true</value> if the validator should allow international characters; otherwise, <value>false</value>.</param>
-/// <exception cref="System.SysUtils.EArgumentException">
+/// <exception cref="System.SysUtils.EArgumentNilException">
 /// <paramref name="Email"/> is <c>Empty</c>.
 /// </exception>
 
-function TEmailValidator.Validate(Email: String;
+class function TEmailValidator.Validate(Email: String;
   allowInternational: Boolean = False): Boolean;
 var
   Index, PrevIndex: Integer;
@@ -404,7 +400,7 @@ var
 begin
   Index := 0;
   if (Email = '') then
-    raise EArgumentException.Create('Email?');
+    raise EArgumentNilException.Create('Email');
   if (Length(Email) = 0) then
   begin
     Result := False;

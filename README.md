@@ -11,14 +11,11 @@ Ported from CSharp to Pascal using this Library [EmailValidation](https://github
 	uses
 	    SysUtils, uEmailValidation;
 	var
-	  TestAddress : String;
-	  Validator: TEmailValidator;
-	
+	  TestAddress : String;	
 	begin
 	  TestAddress := '_somename@example.com';
 	  Validator := TEmailValidator.Create;
-	try
-	 if Validator.Validate(TestAddress) then
+	 if TEmailValidator.Validate(TestAddress) then
 	begin
 	  WriteLn('Valid Email Address');
 	  ReadLn;
@@ -27,9 +24,6 @@ Ported from CSharp to Pascal using this Library [EmailValidation](https://github
 	begin
 	  WriteLn('Invalid Email Address')
 	  ReadLn;
-	end;
-	finally
-	  Validator.Free;
 	end;
     end;
 
@@ -40,13 +34,9 @@ Ported from CSharp to Pascal using this Library [EmailValidation](https://github
 	    SysUtils, uEmailValidation;
 	var
 	  TestAddress : String;
-	  Validator: TEmailValidator;
-	
 	begin
 	  TestAddress := 'θσερ@εχαμπλε.ψομ';
-	  Validator := TEmailValidator.Create;
-	try
-	 if Validator.Validate(TestAddress, True) then
+	 if TEmailValidator.Validate(TestAddress, True) then
 	begin
 	  WriteLn('Valid Email Address');
 	  ReadLn;
@@ -56,7 +46,18 @@ Ported from CSharp to Pascal using this Library [EmailValidation](https://github
 	  WriteLn('Invalid Email Address')
 	  ReadLn;
 	end;
-	finally
-	  Validator.Free;
-	end;
     end;
+
+**`Thanks`**
+ 
+     Special thanks to Andreas Hausladen for suggesting I use static class
+    functions.
+
+**`ChangeLog`**
+
+    25-07-2015
+      Used static class functions as suggested by Andreas Hausladen 
+     to prevent Instantiating an object for a single method call. 
+
+    16-07-2015
+    First Commit
