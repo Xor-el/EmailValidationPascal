@@ -14,7 +14,6 @@ Ported from CSharp to Pascal using this Library [EmailValidation](https://github
 	  TestAddress : String;	
 	begin
 	  TestAddress := '_somename@example.com';
-	  Validator := TEmailValidator.Create;
 	 if TEmailValidator.Validate(TestAddress) then
 	begin
 	  WriteLn('Valid Email Address');
