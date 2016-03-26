@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{688ED8D6-2FE3-4FDA-A644-54B863209B2C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="EmailValidation.Test\EmailValidationUnitTest.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="EmailValidatorOneBasedIndex\EmailValidatorOneBasedIndex.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="EmailValidatorZeroBasedIndex\EmailValidatorZeroBasedIndex.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="EmailValidationUnitTest">
+        <MSBuild Projects="EmailValidation.Test\EmailValidationUnitTest.dproj"/>
+    </Target>
+    <Target Name="EmailValidationUnitTest:Clean">
+        <MSBuild Projects="EmailValidation.Test\EmailValidationUnitTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EmailValidationUnitTest:Make">
+        <MSBuild Projects="EmailValidation.Test\EmailValidationUnitTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EmailValidatorOneBasedIndex">
+        <MSBuild Projects="EmailValidatorOneBasedIndex\EmailValidatorOneBasedIndex.dproj"/>
+    </Target>
+    <Target Name="EmailValidatorOneBasedIndex:Clean">
+        <MSBuild Projects="EmailValidatorOneBasedIndex\EmailValidatorOneBasedIndex.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EmailValidatorOneBasedIndex:Make">
+        <MSBuild Projects="EmailValidatorOneBasedIndex\EmailValidatorOneBasedIndex.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="EmailValidatorZeroBasedIndex">
+        <MSBuild Projects="EmailValidatorZeroBasedIndex\EmailValidatorZeroBasedIndex.dproj"/>
+    </Target>
+    <Target Name="EmailValidatorZeroBasedIndex:Clean">
+        <MSBuild Projects="EmailValidatorZeroBasedIndex\EmailValidatorZeroBasedIndex.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="EmailValidatorZeroBasedIndex:Make">
+        <MSBuild Projects="EmailValidatorZeroBasedIndex\EmailValidatorZeroBasedIndex.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="EmailValidationUnitTest;EmailValidatorOneBasedIndex;EmailValidatorZeroBasedIndex"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="EmailValidationUnitTest:Clean;EmailValidatorOneBasedIndex:Clean;EmailValidatorZeroBasedIndex:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="EmailValidationUnitTest:Make;EmailValidatorOneBasedIndex:Make;EmailValidatorZeroBasedIndex:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
