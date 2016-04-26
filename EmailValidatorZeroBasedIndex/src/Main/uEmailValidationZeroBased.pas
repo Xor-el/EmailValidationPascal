@@ -24,20 +24,20 @@ type
       : Boolean; static;
     class function IsDomain(C: Char; allowInternational: Boolean)
       : Boolean; static;
-    class function SkipAtom(Text: String; var Index: Integer;
+    class function SkipAtom(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
-    class function SkipSubDomain(Text: String; var Index: Integer;
+    class function SkipSubDomain(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
-    class function SkipDomain(Text: String; var Index: Integer;
+    class function SkipDomain(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
-    class function SkipQuoted(Text: String; var Index: Integer;
+    class function SkipQuoted(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
-    class function SkipWord(Text: String; var Index: Integer;
+    class function SkipWord(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
-    class function SkipIPv4Literal(Text: String; var Index: Integer)
+    class function SkipIPv4Literal(const Text: String; var Index: Integer)
       : Boolean; static;
     class function IsHexDigit(C: Char): Boolean; static;
-    class function SkipIPv6Literal(Text: String; var Index: Integer)
+    class function SkipIPv6Literal(const Text: String; var Index: Integer)
       : Boolean; static;
 
   public
@@ -57,7 +57,7 @@ type
     /// <paramref name="Email"/> is <c>Empty</c>.
     /// </exception>
 
-    class function Validate(Email: String; allowInternational: Boolean = False)
+    class function Validate(const Email: String; allowInternational: Boolean = False)
       : Boolean; static;
 
   end;
@@ -91,7 +91,7 @@ begin
     Result := allowInternational;
 end;
 
-class function TEmailValidator.SkipAtom(Text: String; var Index: Integer;
+class function TEmailValidator.SkipAtom(const Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 var
   startIndex: Integer;
@@ -106,7 +106,7 @@ begin
   Result := Index > startIndex;
 end;
 
-class function TEmailValidator.SkipSubDomain(Text: String; var Index: Integer;
+class function TEmailValidator.SkipSubDomain(const Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 var
   startIndex: Integer;
@@ -128,7 +128,7 @@ begin
   Result := ((Index - startIndex) < 64) and (Text.Chars[Index - 1] <> '-');
 end;
 
-class function TEmailValidator.SkipDomain(Text: String; var Index: Integer;
+class function TEmailValidator.SkipDomain(const Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 
 begin
@@ -158,7 +158,7 @@ begin
   Result := True;
 end;
 
-class function TEmailValidator.SkipQuoted(Text: String; var Index: Integer;
+class function TEmailValidator.SkipQuoted(const Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 var
   Escaped: Boolean;
@@ -203,7 +203,7 @@ begin
 
 end;
 
-class function TEmailValidator.SkipWord(Text: String; var Index: Integer;
+class function TEmailValidator.SkipWord(const Text: String; var Index: Integer;
   allowInternational: Boolean): Boolean;
 
 begin
@@ -219,7 +219,7 @@ begin
   end;
 end;
 
-class function TEmailValidator.SkipIPv4Literal(Text: String;
+class function TEmailValidator.SkipIPv4Literal(const Text: String;
   var Index: Integer): Boolean;
 var
   Groups, startIndex, Value: Integer;
@@ -276,7 +276,7 @@ end;
 // ; No more than 4 groups in addition to the "::" and
 // ; IPv4-address-literal may be present
 
-class function TEmailValidator.SkipIPv6Literal(Text: String;
+class function TEmailValidator.SkipIPv6Literal(const Text: String;
   var Index: Integer): Boolean;
 var
   Compact: Boolean;
@@ -377,7 +377,7 @@ begin
 
 end;
 
-class function TEmailValidator.Validate(Email: String;
+class function TEmailValidator.Validate(const Email: String;
   allowInternational: Boolean = False): Boolean;
 var
   Index: Integer;
