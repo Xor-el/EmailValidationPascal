@@ -13,7 +13,7 @@ The (**`uEmailValidation.pas`**) unit should compile in any Delphi version from 
 
 if you are using XE3 Upwards and working with the **`Mobile`** compilers in which strings are Zero-Based by Default, Please use the (**`uEmailValidationZeroBased.pas`**) unit else any of the units you like.
 
-* FreePascal Users can Only use the (**`uEmailValidation.pas`**) unit.
+* FreePascal Users and Delphi Users below XE3 can Only use the (**`uEmailValidation.pas`**) unit.
 
 ###Code Examples
 
