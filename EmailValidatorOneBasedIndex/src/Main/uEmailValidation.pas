@@ -1,14 +1,27 @@
 unit uEmailValidation;
 
+{$IFNDEF FPC}
+{$IF CompilerVersion >= 23}  // XE2 and Above
+{$DEFINE SCOPEDUNITNAMES}
+{$IFEND}
+{$IF CompilerVersion >= 24}  // XE3 and Above
+{$ZEROBASEDSTRINGS OFF}
+{$IFEND}
+{$ENDIF}
+
 interface
 
 uses
 
-{$IFDEF FPC}
-  SysUtils
+{$IFNDEF FPC}
+{$IFDEF SCOPEDUNITNAMES}
+  System.SysUtils;
 {$ELSE}
-    System.SysUtils
-{$ENDIF};
+  SysUtils;
+{$ENDIF}
+{$ELSE}
+SysUtils;
+{$ENDIF FPC}
 
 type
   /// <summary>
@@ -68,10 +81,7 @@ type
 
   end;
 
-{$IFDEF FPC}
-
   EArgumentNilException = class(Exception);
-{$ENDIF}
 
 implementation
 

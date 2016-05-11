@@ -8,8 +8,8 @@ Supports mail addresses as defined in rfc5322 as well as the new Internationaliz
 
 
 #### Building
-This project was created using Delphi 10 Seattle Update 1 but should compile in 
-any Delphi version from XE3 and FreePascal 2.6 Upwards.
+This project was created using Delphi 10 Seattle Update 1. 
+The (**`uEmailValidation.pas`**) unit should compile in any Delphi version from 2009 and FreePascal 2.6.4 Upwards.
 
 if you are using XE3 Upwards and working with the **`Mobile`** compilers in which strings are Zero-Based by Default, Please use the (**`uEmailValidationZeroBased.pas`**) unit else any of the units you like.
 
