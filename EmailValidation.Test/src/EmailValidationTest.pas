@@ -117,7 +117,7 @@ begin
   for LoopCount := 0 to Length(FValidAddresses) - 1 do
   begin
     Assert.IsTrue(uEmailValidation.TEmailValidator.Validate(FValidAddresses
-      [LoopCount]), Format('Valid Address %d: %s',
+      [LoopCount], True), Format('Valid Address %d: %s',
       [LoopCount, FValidAddresses[LoopCount]]));
   end;
 
@@ -130,7 +130,7 @@ begin
   for LoopCount := 0 to Length(FValidAddresses) - 1 do
   begin
     Assert.IsTrue(uEmailValidationZeroBased.TEmailValidator.Validate
-      (FValidAddresses[LoopCount]), Format('Valid Address %d: %s',
+      (FValidAddresses[LoopCount], True), Format('Valid Address %d: %s',
       [LoopCount, FValidAddresses[LoopCount]]));
   end;
 
@@ -143,7 +143,7 @@ begin
   for LoopCount := 0 to Length(FInvalidAddresses) - 1 do
   begin
     Assert.IsFalse(uEmailValidation.TEmailValidator.Validate(FInvalidAddresses
-      [LoopCount]), Format('Invalid Address %d: %s',
+      [LoopCount], True), Format('Invalid Address %d: %s',
       [LoopCount, FInvalidAddresses[LoopCount]]));
   end;
 
@@ -156,7 +156,7 @@ begin
   for LoopCount := 0 to Length(FInvalidAddresses) - 1 do
   begin
     Assert.IsFalse(uEmailValidationZeroBased.TEmailValidator.Validate
-      (FInvalidAddresses[LoopCount]), Format('Invalid Address %d: %s',
+      (FInvalidAddresses[LoopCount], True), Format('Invalid Address %d: %s',
       [LoopCount, FInvalidAddresses[LoopCount]]));
   end;
 
@@ -169,7 +169,7 @@ begin
   for LoopCount := 0 to Length(FValidInternationalAddresses) - 1 do
   begin
     Assert.IsTrue(uEmailValidation.TEmailValidator.Validate
-      (FValidInternationalAddresses[LoopCount], True),
+      (FValidInternationalAddresses[LoopCount], True, True),
       Format('Valid International Address %d: %s',
       [LoopCount, FValidInternationalAddresses[LoopCount]]));
   end;
@@ -183,7 +183,7 @@ begin
   for LoopCount := 0 to Length(FValidInternationalAddresses) - 1 do
   begin
     Assert.IsTrue(uEmailValidationZeroBased.TEmailValidator.Validate
-      (FValidInternationalAddresses[LoopCount], True),
+      (FValidInternationalAddresses[LoopCount], True, True),
       Format('Valid International Address %d: %s',
       [LoopCount, FValidInternationalAddresses[LoopCount]]));
   end;

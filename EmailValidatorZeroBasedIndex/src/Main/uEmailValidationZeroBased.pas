@@ -29,7 +29,7 @@ type
     class function SkipSubDomain(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
     class function SkipDomain(const Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean; static;
+      allowTopLevelDomains, allowInternational: Boolean): Boolean; static;
     class function SkipQuoted(const Text: String; var Index: Integer;
       allowInternational: Boolean): Boolean; static;
     class function SkipWord(const Text: String; var Index: Integer;
@@ -52,13 +52,15 @@ type
     /// </remarks>
     /// <returns><c>true</c> if the email address is valid; otherwise <c>false</c>.</returns>
     /// <param name="Email">An email address.</param>
+    /// <param name="allowTopLevelDomains"><value>true</value> if the validator should allow addresses at top-level domains; otherwise, <value>false</value>.</param>
     /// <param name="allowInternational"><value>true</value> if the validator should allow international characters; otherwise, <value>false</value>.</param>
     /// <exception cref="System.SysUtils.EArgumentNilException">
     /// <paramref name="Email"/> is <c>Empty</c>.
     /// </exception>
 
-    class function Validate(const Email: String; allowInternational: Boolean = False)
-      : Boolean; static;
+    class function Validate(const Email: String;
+      allowTopLevelDomains: Boolean = False;
+      allowInternational: Boolean = False): Boolean; static;
 
   end;
 
@@ -106,8 +108,8 @@ begin
   Result := Index > startIndex;
 end;
 
-class function TEmailValidator.SkipSubDomain(const Text: String; var Index: Integer;
-  allowInternational: Boolean): Boolean;
+class function TEmailValidator.SkipSubDomain(const Text: String;
+  var Index: Integer; allowInternational: Boolean): Boolean;
 var
   startIndex: Integer;
 
@@ -128,8 +130,9 @@ begin
   Result := ((Index - startIndex) < 64) and (Text.Chars[Index - 1] <> '-');
 end;
 
-class function TEmailValidator.SkipDomain(const Text: String; var Index: Integer;
-  allowInternational: Boolean): Boolean;
+class function TEmailValidator.SkipDomain(const Text: String;
+  var Index: Integer; allowTopLevelDomains, allowInternational
+  : Boolean): Boolean;
 
 begin
 
@@ -138,28 +141,39 @@ begin
     Result := False;
     Exit;
   end;
-  while ((Index < Text.Length) and ((Text.Chars[Index]) = '.')) do
+
+  if ((Index < Text.Length) and ((Text.Chars[Index]) = '.')) then
   begin
-    Inc(Index);
-    if (Index = Text.Length) then
+
+    while ((Index < Text.Length) and ((Text.Chars[Index]) = '.')) do
     begin
-      Result := False;
-      Exit;
+      Inc(Index);
+      if (Index = Text.Length) then
+      begin
+        Result := False;
+        Exit;
+      end;
+
+      if (not SkipSubDomain(Text, Index, allowInternational)) then
+      begin
+        Result := False;
+        Exit;
+      end;
     end;
 
-    if (not SkipSubDomain(Text, Index, allowInternational)) then
-    begin
-      Result := False;
-      Exit;
-    end;
+  end
+  else if (not allowTopLevelDomains) then
 
+  begin
+    Result := False;
+    Exit;
   end;
 
   Result := True;
 end;
 
-class function TEmailValidator.SkipQuoted(const Text: String; var Index: Integer;
-  allowInternational: Boolean): Boolean;
+class function TEmailValidator.SkipQuoted(const Text: String;
+  var Index: Integer; allowInternational: Boolean): Boolean;
 var
   Escaped: Boolean;
 
@@ -378,6 +392,7 @@ begin
 end;
 
 class function TEmailValidator.Validate(const Email: String;
+  allowTopLevelDomains: Boolean = False;
   allowInternational: Boolean = False): Boolean;
 var
   Index: Integer;
@@ -433,7 +448,8 @@ begin
   if (Email.Chars[Index] <> '[') then
   begin
     // domain
-    if (not SkipDomain(Email, Index, allowInternational)) then
+    if (not SkipDomain(Email, Index, allowTopLevelDomains, allowInternational))
+    then
     begin
       Result := False;
       Exit;
