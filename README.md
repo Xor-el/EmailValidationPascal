@@ -4,7 +4,7 @@
 
 A simple (but correct) Pascal class for validating email addresses.
 
-Supports mail addresses as defined in rfc5322 as well as the new Internationalized Mail Address standards (rfc653x).
+Supports Internationalized Mail Address standards (rfc653x).
 
 
 #### Building

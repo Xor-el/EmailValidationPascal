@@ -19,26 +19,31 @@ type
   const
     atomCharacters: String = '!#$%&''*+-/=?^_`{|}~';
 
-    class function IsLetterOrDigit(C: Char): Boolean; static;
-    class function IsAtom(C: Char; allowInternational: Boolean)
-      : Boolean; static;
-    class function IsDomain(C: Char; allowInternational: Boolean)
-      : Boolean; static;
-    class function SkipAtom(const Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean; static;
-    class function SkipSubDomain(const Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean; static;
-    class function SkipDomain(const Text: String; var Index: Integer;
-      allowTopLevelDomains, allowInternational: Boolean): Boolean; static;
-    class function SkipQuoted(const Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean; static;
-    class function SkipWord(const Text: String; var Index: Integer;
-      allowInternational: Boolean): Boolean; static;
-    class function SkipIPv4Literal(const Text: String; var Index: Integer)
-      : Boolean; static;
-    class function IsHexDigit(C: Char): Boolean; static;
-    class function SkipIPv6Literal(const Text: String; var Index: Integer)
-      : Boolean; static;
+  type
+
+    TSubDomainType = (None = 0, Alphabetic = 1, Numeric = 2, AlphaNumeric = 3);
+
+  class function IsDigit(C: Char): Boolean; static;
+  class function IsLetter(C: Char): Boolean; static;
+  class function IsLetterOrDigit(C: Char): Boolean; static;
+  class function IsAtom(C: Char; allowInternational: Boolean): Boolean; static;
+  class function IsDomain(C: Char; allowInternational: Boolean;
+    var dtype: TSubDomainType): Boolean; static;
+  class function IsDomainStart(C: Char; allowInternational: Boolean;
+    out dtype: TSubDomainType): Boolean; static;
+  class function SkipAtom(const Text: String; var Index: Integer;
+    allowInternational: Boolean): Boolean; static;
+  class function SkipSubDomain(const Text: String; var Index: Integer;
+    allowInternational: Boolean; out dtype: TSubDomainType): Boolean; static;
+  class function SkipDomain(const Text: String; var Index: Integer;
+    allowTopLevelDomains, allowInternational: Boolean): Boolean; static;
+  class function SkipQuoted(const Text: String; var Index: Integer;
+    allowInternational: Boolean): Boolean; static;
+  class function SkipIPv4Literal(const Text: String; var Index: Integer)
+    : Boolean; static;
+  class function IsHexDigit(C: Char): Boolean; static;
+  class function SkipIPv6Literal(const Text: String; var Index: Integer)
+    : Boolean; static;
 
   public
 
@@ -66,11 +71,20 @@ type
 
 implementation
 
+class function TEmailValidator.IsDigit(C: Char): Boolean;
+begin
+  Result := ((C >= '0') and (C <= '9'));
+end;
+
+class function TEmailValidator.IsLetter(C: Char): Boolean;
+begin
+  Result := ((C >= 'A') and (C <= 'Z')) or ((C >= 'a') and (C <= 'z'));
+end;
+
 class function TEmailValidator.IsLetterOrDigit(C: Char): Boolean;
 begin
 
-  Result := ((C >= 'A') and (C <= 'Z')) or ((C >= 'a') and (C <= 'z')) or
-    ((C >= '0') and (C <= '9'));
+  Result := (IsLetter(C)) or (IsDigit(C));
 end;
 
 class function TEmailValidator.IsAtom(C: Char;
@@ -83,14 +97,76 @@ begin
     Result := allowInternational;
 end;
 
-class function TEmailValidator.IsDomain(C: Char;
-  allowInternational: Boolean): Boolean;
+class function TEmailValidator.IsDomain(C: Char; allowInternational: Boolean;
+  var dtype: TSubDomainType): Boolean;
 
 begin
-  if Ord(C) < 128 then
-    Result := (IsLetterOrDigit(C) or (C = '-'))
-  else
-    Result := allowInternational;
+
+  if (Ord(C) < 128) then
+  begin
+    if (IsLetter(C) or (C = '-')) then
+    begin
+      dtype := TSubDomainType(Ord(dtype) or Ord(TSubDomainType.Alphabetic));
+      Result := true;
+      Exit;
+    end;
+
+    if (IsDigit(C)) then
+    begin
+      dtype := TSubDomainType(Ord(dtype) or Ord(TSubDomainType.Numeric));
+      Result := true;
+      Exit;
+    end;
+
+    Result := False;
+    Exit;
+  end;
+
+  if (allowInternational) then
+  begin
+    dtype := TSubDomainType(Ord(dtype) or Ord(TSubDomainType.Alphabetic));
+    Result := true;
+    Exit;
+  end;
+
+  Result := False;
+end;
+
+class function TEmailValidator.IsDomainStart(C: Char;
+  allowInternational: Boolean; out dtype: TSubDomainType): Boolean;
+
+begin
+
+  if (Ord(C) < 128) then
+  begin
+    if (IsLetter(C)) then
+    begin
+      dtype := TSubDomainType.Alphabetic;
+      Result := true;
+      Exit;
+    end;
+
+    if (IsDigit(C)) then
+    begin
+      dtype := TSubDomainType.Numeric;
+      Result := true;
+      Exit;
+    end;
+
+    Result := False;
+    Exit;
+  end;
+
+  if (allowInternational) then
+  begin
+    dtype := TSubDomainType.Alphabetic;
+    Result := true;
+    Exit;
+  end;
+
+  dtype := TSubDomainType.None;
+
+  Result := False;
 end;
 
 class function TEmailValidator.SkipAtom(const Text: String; var Index: Integer;
@@ -109,21 +185,21 @@ begin
 end;
 
 class function TEmailValidator.SkipSubDomain(const Text: String;
-  var Index: Integer; allowInternational: Boolean): Boolean;
+  var Index: Integer; allowInternational: Boolean;
+  out dtype: TSubDomainType): Boolean;
 var
   startIndex: Integer;
 
 begin
   startIndex := Index;
-  if ((not IsDomain(Text.Chars[Index], allowInternational)) or
-    ((Text.Chars[Index]) = '-')) then
+  if (not IsDomainStart(Text.Chars[Index], allowInternational, dtype)) then
   begin
     Result := False;
     Exit;
   end;
   Inc(Index);
   while ((Index < Text.Length) and IsDomain(Text.Chars[Index],
-    allowInternational)) do
+    allowInternational, dtype)) do
   begin
     Inc(Index);
   end;
@@ -134,9 +210,12 @@ class function TEmailValidator.SkipDomain(const Text: String;
   var Index: Integer; allowTopLevelDomains, allowInternational
   : Boolean): Boolean;
 
+var
+  dtype: TSubDomainType;
+
 begin
 
-  if (not SkipSubDomain(Text, Index, allowInternational)) then
+  if (not SkipSubDomain(Text, Index, allowInternational, dtype)) then
   begin
     Result := False;
     Exit;
@@ -154,7 +233,7 @@ begin
         Exit;
       end;
 
-      if (not SkipSubDomain(Text, Index, allowInternational)) then
+      if (not SkipSubDomain(Text, Index, allowInternational, dtype)) then
       begin
         Result := False;
         Exit;
@@ -169,7 +248,14 @@ begin
     Exit;
   end;
 
-  Result := True;
+  // Note: by allowing AlphaNumeric, we get away with not having to support punycode.
+  if (dtype = TSubDomainType.Numeric) then
+  begin
+    Result := False;
+    Exit;
+  end;
+
+  Result := true;
 end;
 
 class function TEmailValidator.SkipQuoted(const Text: String;
@@ -213,24 +299,8 @@ begin
 
   Inc(Index);
 
-  Result := True;
+  Result := true;
 
-end;
-
-class function TEmailValidator.SkipWord(const Text: String; var Index: Integer;
-  allowInternational: Boolean): Boolean;
-
-begin
-  if ((Text.Chars[Index]) = '"') then
-  begin
-    Result := SkipQuoted(Text, Index, allowInternational);
-    Exit;
-  end
-  else
-  begin
-    Result := SkipAtom(Text, Index, allowInternational);
-    Exit;
-  end;
 end;
 
 class function TEmailValidator.SkipIPv4Literal(const Text: String;
@@ -362,7 +432,7 @@ begin
         Result := False;
         Exit;
       end;
-      Compact := True;
+      Compact := true;
       Colons := Colons + 2;
     end
     else
@@ -407,36 +477,53 @@ begin
     Exit;
   end;
 
-  if ((not SkipWord(Email, Index, allowInternational)) or
-    (Index >= Email.Length)) then
+  // Local-part = Dot-string / Quoted-string
+  // ; MAY be case-sensitive
+  //
+  // Dot-string = Atom *("." Atom)
+  //
+  // Quoted-string = DQUOTE *qcontent DQUOTE
+  if (Email.Chars[Index] = '"') then
   begin
-    Result := False;
-    Exit;
-  end;
-
-  while (Email.Chars[Index] = '.') do
+    if (not SkipQuoted(Email, Index, allowInternational) or
+      (Index >= Email.Length)) then
+    begin
+      Result := False;
+      Exit;
+    end;
+  end
+  else
   begin
-    Inc(Index);
-
-    if (Index >= Email.Length) then
+    if (not SkipAtom(Email, Index, allowInternational) or
+      (Index >= Email.Length)) then
     begin
       Result := False;
       Exit;
     end;
 
-    if (not SkipWord(Email, Index, allowInternational)) then
+    while (Email.Chars[Index] = '.') do
     begin
-      Result := False;
-      Exit;
-    end;
+      Inc(Index);
 
-    if (Index >= Email.Length) then
-    begin
-      Result := False;
-      Exit;
+      if (Index >= Email.Length) then
+      begin
+        Result := False;
+        Exit;
+      end;
+
+      if (not SkipAtom(Email, Index, allowInternational)) then
+      begin
+        Result := False;
+        Exit;
+      end;
+
+      if (Index >= Email.Length) then
+      begin
+        Result := False;
+        Exit;
+      end;
     end;
   end;
-
   if ((Index + 1 >= Email.Length) or (Index > 64) or (Email.Chars[Index] <> '@'))
   then
   begin
